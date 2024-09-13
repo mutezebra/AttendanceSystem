@@ -80,6 +80,14 @@ func (usecase *UserUsecase) GetVerifyCode(ctx context.Context, req *user.GetVeri
 		return nil, err
 	}
 
+	var exist bool
+	if exist, err = usecase.svc.PhoneNumberExist(req.GetPhoneNumber()); err != nil {
+		return nil, err
+	}
+	if exist {
+		return nil, errno.New(errno.ExistPhoneNumber, "phone number have exist")
+	}
+
 	var code string
 	if code, err = usecase.svc.SendEms(ctx, req.GetPhoneNumber()); err != nil {
 		return nil, err
