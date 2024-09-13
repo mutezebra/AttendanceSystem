@@ -26,10 +26,9 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetUserUsecase().Register(ctx, &req)
 	if err != nil {
 		resp = new(user.RegisterResp)
-		resp.Base = new(base.Base)
 		errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
-		resp.Base.Code, resp.Base.Msg = &code, &msg
+		resp.Base = &base.Base{Code: &code, Msg: &msg}
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
@@ -51,10 +50,9 @@ func GetVerifyCode(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetUserUsecase().GetVerifyCode(ctx, &req)
 	if err != nil {
 		resp = new(user.GetVerifyCodeResp)
-		resp.Base = new(base.Base)
 		errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
-		resp.Base.Code, resp.Base.Msg = &code, &msg
+		resp.Base = &base.Base{Code: &code, Msg: &msg}
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
@@ -76,10 +74,9 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetUserUsecase().Login(ctx, &req)
 	if err != nil {
 		resp = new(user.LoginResp)
-		resp.Base = new(base.Base)
 		errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
-		resp.Base.Code, resp.Base.Msg = &code, &msg
+		resp.Base = &base.Base{Code: &code, Msg: &msg}
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
