@@ -1,0 +1,31 @@
+version: '3.7'
+
+networks:
+  CallSystem:
+    driver: bridge
+
+services:
+  mysql:
+    container_name: db
+    image: mysql:latest
+    restart: always
+    volumes:
+      - ./config/mysql-init:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=call_system
+      - TZ=Asia/Shanghai
+    ports:
+      - "3306:3306"
+    networks:
+      - CallSystem
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: on-failure
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass password111
+    networks:
+      - CallSystem

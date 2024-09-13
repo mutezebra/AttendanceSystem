@@ -1,0 +1,27 @@
+system:
+  os: "linux"
+  status: "debug"
+  worker_id: 1
+  data_center_id: 1
+
+mysql:
+  username: "root"
+  password: "password111"
+  address: "127.0.0.1:3306"
+  database: "call_system"
+  charset: "utf8mb4"
+
+redis:
+  host: "127.0.0.1"
+  port: "6379"
+  database: 0
+  network: "tcp"
+  password: "password111"
+
+paths:
+  default_avatar_path: "/avatar/default.jpg"
+
+aliyun:
+  access_key_id: "your id"
+  access_key_secret: "you ack"
+  endpoint: "dysmsapi.aliyuncs.com"
