@@ -34,7 +34,9 @@ func GetUserUsecase() *UserUsecase {
 }
 
 func (usecase *UserUsecase) Register(ctx context.Context, req *user.RegisterReq) (resp *user.RegisterResp, err error) {
-	defer pack.LogError(err)
+	defer func() {
+		pack.LogError(err)
+	}()
 
 	if err = usecase.svc.VerifyRequest(req); err != nil {
 		return nil, err
@@ -74,7 +76,9 @@ func (usecase *UserUsecase) Register(ctx context.Context, req *user.RegisterReq)
 }
 
 func (usecase *UserUsecase) GetVerifyCode(ctx context.Context, req *user.GetVerifyCodeReq) (resp *user.GetVerifyCodeResp, err error) {
-	defer pack.LogError(err)
+	defer func() {
+		pack.LogError(err)
+	}()
 
 	if err = usecase.svc.VerifyRequest(req); err != nil {
 		return nil, err
@@ -100,7 +104,9 @@ func (usecase *UserUsecase) GetVerifyCode(ctx context.Context, req *user.GetVeri
 }
 
 func (usecase *UserUsecase) Login(ctx context.Context, req *user.LoginReq) (resp *user.LoginResp, err error) {
-	defer pack.LogError(err)
+	defer func() {
+		pack.LogError(err)
+	}()
 
 	if err = usecase.svc.VerifyRequest(req); err != nil {
 		return nil, err
