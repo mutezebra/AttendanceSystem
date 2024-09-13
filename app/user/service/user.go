@@ -7,14 +7,13 @@ import (
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/config"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/consts"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/ems"
+	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/utils"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/repository/cache"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/repository/database"
 	"github.com/mutezebra/tiktok/pkg/snowflake"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
-	"math/rand"
 	"regexp"
-	"strings"
 )
 
 type UserService struct {
@@ -102,12 +101,7 @@ func (svc *UserService) CreateUser(req *user.RegisterReq) error {
 }
 
 func (svc *UserService) SendEms(ctx context.Context, phoneNumber string) (code string, err error) {
-	codes := [10]byte{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
-	sb := strings.Builder{}
-	for i := 0; i < 6; i++ {
-		sb.WriteByte(codes[rand.Intn(len(codes))])
-	}
-	code = sb.String()
+	code = utils.GenerateCode(6)
 	if err = svc.ems.SendEms(phoneNumber, code); err != nil {
 		return "", err
 	}
