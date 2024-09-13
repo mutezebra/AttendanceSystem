@@ -12,13 +12,22 @@ CREATE TABLE IF NOT EXISTS class (
     id  BIGINT UNSIGNED COMMENT 'PK',
     name varchar(255) NOT NULL DEFAULT '' COMMENT '班级名称',
     user_count int UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户数量',
+    invitation_code varchar(6) NOT NULL DEFAULT ''COMMENT '邀请码',
     PRIMARY KEY pk_user(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='班级表' ;
 
 CREATE TABLE IF NOT EXISTS user_with_class (
     uid  BIGINT UNSIGNED COMMENT 'uid',
     class_id  BIGINT UNSIGNED COMMENT 'class_id',
-    standing int8 NOT NULL DEFAULT 0 COMMENT '0 学生，1 教师'
+    INDEX idx_class_id (class_id),
+    INDEX idx_user_id (uid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户班级关联表' ;
+
+
+CREATE TABLE IF NOT EXISTS class_owner (
+    uid  BIGINT UNSIGNED COMMENT 'uid',
+    class_id  BIGINT UNSIGNED COMMENT 'class_id',
+    INDEX idx_class_id (uid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='教师班级关联表' ;
 
 

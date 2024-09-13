@@ -6,7 +6,7 @@ type e int32
 var (
 	LackToken   e = 1000
 	TokenExpire e = 1001
-	WrongToken  e = 1001
+	WrongToken  e = 1002
 )
 
 // User
@@ -27,6 +27,15 @@ var (
 	VerifyCodeExpired    e = 10012
 	WrongVerifyCode      e = 10013
 	WrongPassword        e = 10014
+)
 
-	UserRegisterFailed e = 10100
+// class
+const (
+	WrongClassNameLength      e = 20000
+	ClassNotExist             e = 20001
+	WrongInvitationCodeLength e = 20002
+	WrongInvitationCode       e = 20003
+	IllegalInvitationCode     e = 20004
+	NotClassMember            e = 20005
+	HaveInClass               e = 20006
 )
