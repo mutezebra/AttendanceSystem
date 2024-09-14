@@ -124,7 +124,7 @@ func (repo *ClassRepository) ClassList(ctx context.Context, uid int64) (classes 
 
 func (repo *ClassRepository) ClassStudentList(ctx context.Context, classID int64) (users []*user.BaseUser, err error) {
 	users = make([]*user.BaseUser, 0)
-	query := "SELECT student_number,name,avatar FROM user WHERE id in (SELECT uid FROM user_with_class WHERE class_id=?)"
+	query := "SELECT student_number,name,avatar,id FROM user WHERE id in (SELECT uid FROM user_with_class WHERE class_id=?)"
 	var rows *sql.Rows
 	if rows, err = repo.db.Query(query, classID); err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, errors.Wrap(err, fmt.Sprintf("failed when query %d`s students", classID))
@@ -133,7 +133,7 @@ func (repo *ClassRepository) ClassStudentList(ctx context.Context, classID int64
 
 	for rows.Next() {
 		var u user.BaseUser
-		if err = rows.Scan(&u.StudentNumber, &u.Name, &u.Avatar); err != nil {
+		if err = rows.Scan(&u.StudentNumber, &u.Name, &u.Avatar, &u.UID); err != nil {
 			return nil, errors.Wrap(err, "failed when scan u to user")
 		}
 		users = append(users, &u)
@@ -141,11 +141,11 @@ func (repo *ClassRepository) ClassStudentList(ctx context.Context, classID int64
 	return users, nil
 }
 
-func (repo *ClassRepository) GetTeacherInfo(ctx context.Context, classID int64) (u *user.BaseUser, err error) {
-	us := user.BaseUser{}
-	query := "SELECT name,avatar FROM user WHERE id=(SELECT uid FROM class_owner WHERE class_id=?)"
-	if err = repo.db.QueryRow(query, classID).Scan(&us.Name, &us.Avatar); err != nil {
-		return &us, errors.Wrap(err, "failed when try to find class`s teacher")
+func (repo *ClassRepository) GetTeacherInfo(ctx context.Context, classID int64) (us *user.BaseUser, err error) {
+	us = &user.BaseUser{}
+	query := "SELECT name,avatar,id FROM user WHERE id=(SELECT uid FROM class_owner WHERE class_id=?)"
+	if err = repo.db.QueryRow(query, classID).Scan(&us.Name, &us.Avatar, &us.Avatar); err != nil {
+		return us, errors.Wrap(err, "failed when try to find class`s teacher")
 	}
-	return &us, nil
+	return us, nil
 }
