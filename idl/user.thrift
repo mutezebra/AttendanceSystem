@@ -15,6 +15,7 @@ struct BaseUser {
     1: optional string StudentNumber (api.body="student_number")
     2: optional string Name (api.body="name");
     3: optional string Avatar (api.body="avatar");
+    4: optional i64 UID (api.body="uid")
 }
 
 struct RegisterReq {

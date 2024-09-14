@@ -6,7 +6,7 @@ include "user.thrift"
 struct UserWithClass {
     1: optional i64 UID (api.body="uid");
     2: optional string ClassID (api.body="class_id");
-    3: optional i8 Standing (api.body="standing"); // 0 学生, 1 教师
+    3: optional i32 Weight (api.body="weight")
 }
 
 struct Class {

@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS class (
 CREATE TABLE IF NOT EXISTS user_with_class (
     uid  BIGINT UNSIGNED COMMENT 'uid',
     class_id  BIGINT UNSIGNED COMMENT 'class_id',
+    weight INT UNSIGNED DEFAULT 1 COMMENT '权重',
     INDEX idx_class_id (class_id),
     INDEX idx_user_id (uid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户班级关联表' ;
