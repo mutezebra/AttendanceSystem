@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/biz/model/api/user"
+	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/pack"
 	"github.com/pkg/errors"
 )
 
@@ -55,4 +56,23 @@ func (repo *UserRepository) FindUIDByPhoneNumber(phoneNumber string) (int64, err
 		return 0, errors.Wrap(err, "failed when find user id by phone_number")
 	}
 	return uid, nil
+}
+
+func (repo *UserRepository) FindUserByUID(uids []int64) (users []*user.BaseUser, err error) {
+	var pre *sql.Stmt
+	defer func() {
+		pack.LogError(pre.Close())
+	}()
+	if pre, err = repo.db.Prepare("SELECT id,name,student_number,avatar FROM user WHERE id=?"); err != nil {
+		return nil, errors.Wrap(err, "failed when prepare query")
+	}
+	users = make([]*user.BaseUser, 0, len(uids))
+	for _, uid := range uids {
+		var u user.BaseUser
+		if err = pre.QueryRow(uid).Scan(&u.UID, &u.Name, &u.StudentNumber, &u.Avatar); err != nil {
+			return nil, errors.Wrap(err, "failed when scan user")
+		}
+		users = append(users, &u)
+	}
+	return users, nil
 }

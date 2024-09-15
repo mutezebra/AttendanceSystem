@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestInitCache(t *testing.T) {
+func testInit(t *testing.T) {
 	host, port, password, network, db := "127.0.0.1", "6379", "123456", "tcp", 0
 	redis := config.Redis{
 		Host:     host,
@@ -16,12 +16,14 @@ func TestInitCache(t *testing.T) {
 		Network:  network,
 		Password: password,
 	}
-
 	conf := &config.Config{Redis: &redis}
 	MockValue(&config.Conf).To(conf)
+	InitCache()
+}
 
+func TestInitCache(t *testing.T) {
+	testInit(t)
 	Convey("Test Redis Init", t, func() {
-		InitCache()
 		So(RedisClient, ShouldNotBeNil)
 	})
 }

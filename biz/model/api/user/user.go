@@ -449,6 +449,8 @@ type BaseUser struct {
 	StudentNumber *string `thrift:"StudentNumber,1,optional" form:"student_number" json:"student_number,omitempty"`
 	Name          *string `thrift:"Name,2,optional" form:"name" json:"name,omitempty"`
 	Avatar        *string `thrift:"Avatar,3,optional" form:"avatar" json:"avatar,omitempty"`
+	UID           *int64  `thrift:"UID,4,optional" form:"uid" json:"uid,omitempty"`
+	Weight        *int32  `thrift:"Weight,5,optional" form:"weight" json:"weight,omitempty"`
 }
 
 func NewBaseUser() *BaseUser {
@@ -485,10 +487,30 @@ func (p *BaseUser) GetAvatar() (v string) {
 	return *p.Avatar
 }
 
+var BaseUser_UID_DEFAULT int64
+
+func (p *BaseUser) GetUID() (v int64) {
+	if !p.IsSetUID() {
+		return BaseUser_UID_DEFAULT
+	}
+	return *p.UID
+}
+
+var BaseUser_Weight_DEFAULT int32
+
+func (p *BaseUser) GetWeight() (v int32) {
+	if !p.IsSetWeight() {
+		return BaseUser_Weight_DEFAULT
+	}
+	return *p.Weight
+}
+
 var fieldIDToName_BaseUser = map[int16]string{
 	1: "StudentNumber",
 	2: "Name",
 	3: "Avatar",
+	4: "UID",
+	5: "Weight",
 }
 
 func (p *BaseUser) IsSetStudentNumber() bool {
@@ -501,6 +523,14 @@ func (p *BaseUser) IsSetName() bool {
 
 func (p *BaseUser) IsSetAvatar() bool {
 	return p.Avatar != nil
+}
+
+func (p *BaseUser) IsSetUID() bool {
+	return p.UID != nil
+}
+
+func (p *BaseUser) IsSetWeight() bool {
+	return p.Weight != nil
 }
 
 func (p *BaseUser) Read(iprot thrift.TProtocol) (err error) {
@@ -541,6 +571,22 @@ func (p *BaseUser) Read(iprot thrift.TProtocol) (err error) {
 		case 3:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 4:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 5:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
@@ -608,6 +654,28 @@ func (p *BaseUser) ReadField3(iprot thrift.TProtocol) error {
 	p.Avatar = _field
 	return nil
 }
+func (p *BaseUser) ReadField4(iprot thrift.TProtocol) error {
+
+	var _field *int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.UID = _field
+	return nil
+}
+func (p *BaseUser) ReadField5(iprot thrift.TProtocol) error {
+
+	var _field *int32
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.Weight = _field
+	return nil
+}
 
 func (p *BaseUser) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
@@ -625,6 +693,14 @@ func (p *BaseUser) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField3(oprot); err != nil {
 			fieldId = 3
+			goto WriteFieldError
+		}
+		if err = p.writeField4(oprot); err != nil {
+			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
 			goto WriteFieldError
 		}
 	}
@@ -702,6 +778,44 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
+func (p *BaseUser) writeField4(oprot thrift.TProtocol) (err error) {
+	if p.IsSetUID() {
+		if err = oprot.WriteFieldBegin("UID", thrift.I64, 4); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteI64(*p.UID); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+}
+
+func (p *BaseUser) writeField5(oprot thrift.TProtocol) (err error) {
+	if p.IsSetWeight() {
+		if err = oprot.WriteFieldBegin("Weight", thrift.I32, 5); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteI32(*p.Weight); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
+}
+
 func (p *BaseUser) String() string {
 	if p == nil {
 		return "<nil>"
@@ -714,8 +828,8 @@ type RegisterReq struct {
 	Name          *string `thrift:"Name,1,optional" form:"name" json:"name,omitempty"`
 	Password      *string `thrift:"Password,2,optional" form:"password" json:"password,omitempty"`
 	StudentNumber *string `thrift:"StudentNumber,3,optional" form:"student_number" json:"student_number,omitempty"`
-	PhoneNumber   *string `thrift:"PhoneNumber,4,optional" form:"phone_number" form:"phone_number" json:"phone_number,omitempty"`
-	VerifyCode    *string `thrift:"VerifyCode,5,optional" form:"verify_code" json:"verify_code,omitempty"`
+	PhoneNumber   *string `thrift:"PhoneNumber,4,optional" form:"phone_number" json:"phone_number,omitempty"`
+	VerifyCode    *string `thrift:"VerifyCode,5,optional" form:"verify_code" form:"verify_code" json:"verify_code,omitempty"`
 }
 
 func NewRegisterReq() *RegisterReq {
@@ -1595,7 +1709,7 @@ func (p *GetVerifyCodeResp) String() string {
 
 type LoginReq struct {
 	PhoneNumber *string `thrift:"PhoneNumber,1,optional" form:"phone_number" json:"phone_number,omitempty"`
-	Password    *string `thrift:"Password,2,optional" form:"password" form:"password" json:"password,omitempty"`
+	Password    *string `thrift:"Password,2,optional" form:"password" json:"password,omitempty"`
 }
 
 func NewLoginReq() *LoginReq {

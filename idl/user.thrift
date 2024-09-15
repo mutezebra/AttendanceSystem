@@ -16,6 +16,7 @@ struct BaseUser {
     2: optional string Name (api.body="name");
     3: optional string Avatar (api.body="avatar");
     4: optional i64 UID (api.body="uid")
+    5: optional i32 Weight (api.body="weight")
 }
 
 struct RegisterReq {

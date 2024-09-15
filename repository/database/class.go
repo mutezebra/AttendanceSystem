@@ -62,8 +62,8 @@ func (repo *ClassRepository) IsClassOwner(ctx context.Context, uid, classID int6
 }
 
 func (repo *ClassRepository) WhetherUserInClass(ctx context.Context, uid, classID int64) (in bool, err error) {
-	query := "SELECT EXISTS(SELECT 1 from user_with_class WHERE uid=? AND class_id=?)"
-	if err = repo.db.QueryRow(query, uid, classID).Scan(&in); err != nil && !errors.Is(err, sql.ErrNoRows) {
+	query := "SELECT EXISTS(SELECT 1 from user_with_class WHERE uid=? AND class_id=?) OR EXISTS(SELECT 1 from class_owner WHERE uid=? AND class_id=?) "
+	if err = repo.db.QueryRow(query, uid, classID, uid, classID).Scan(&in); err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return false, errors.Wrap(err, fmt.Sprintf("failed when query whether %d have in %d", uid, classID))
 	}
 	return in, nil

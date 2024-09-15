@@ -10,7 +10,7 @@ var (
 )
 
 // User
-var (
+const (
 	EmptyUserName        e = 10000
 	EmptyPassword        e = 10001
 	EmptyPhoneNumber     e = 10002
@@ -38,4 +38,18 @@ const (
 	IllegalInvitationCode     e = 20004
 	NotClassMember            e = 20005
 	HaveInClass               e = 20006
+	NotClassOwner             e = 20007
+)
+
+// call
+const (
+	IllegalCallNumber         e = 30000
+	IllegalDeadline           e = 30001
+	HaveCallEvent             e = 30002
+	WrongEventNameLength      e = 30003
+	EventNotExist             e = 30004
+	ExpireORNotExist          e = 30005
+	ExpiredEvent              e = 30006
+	NotClassMemberORNewMember e = 30007
+	NotEnoughStudent          e = 30008
 )
