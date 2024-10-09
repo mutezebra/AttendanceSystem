@@ -26,6 +26,7 @@ func WeightedRandom(items []*Item, count int) ([]int64, error) {
 		for index, item := range items {
 			if r < item.Weight {
 				items = removeKey(items, index)
+				totalWeight = subTotalWeight(totalWeight, item.Weight)
 				break
 			}
 			r -= item.Weight
