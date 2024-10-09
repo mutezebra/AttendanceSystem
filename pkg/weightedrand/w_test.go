@@ -6,11 +6,11 @@ import (
 )
 
 func TestWeightedRandom(t *testing.T) {
-	items := []Item{
-		{1, 0},
-		{2, 1},
-		{3, 0},
-		{4, 0},
+	items := []*Item{
+		{1, 100},
+		{2, 100},
+		{3, 100},
+		{4, 1},
 	}
 	times := make(map[int64]int)
 	keys, err := WeightedRandom(items, 1)

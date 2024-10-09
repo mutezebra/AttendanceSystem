@@ -11,6 +11,7 @@ type Item struct {
 	Weight int
 }
 
+// WeightedRandom 权重越高,越不容易被抽中
 func WeightedRandom(items []*Item, count int) ([]int64, error) {
 	totalWeight := 0
 	for _, item := range items {
