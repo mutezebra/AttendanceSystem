@@ -15,5 +15,5 @@ func TestReadExcelToUsers(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("%v", us[0])
+	t.Logf("%v", *us[0])
 }

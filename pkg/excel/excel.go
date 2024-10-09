@@ -8,12 +8,18 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-type User struct {
+type ImportUser struct {
 	StudentNumber string
 	Name          string
+	PhoneNumber   string
 }
 
-func ReadExcelToUsers(data []byte) ([]*User, error) {
+type ExportUser struct {
+	UID      int64
+	Password string
+}
+
+func ReadExcelToUsers(data []byte) ([]*ImportUser, error) {
 	buffer := bytes.NewBuffer(data)
 	f, err := excelize.OpenReader(buffer)
 	if err != nil {
@@ -25,21 +31,23 @@ func ReadExcelToUsers(data []byte) ([]*User, error) {
 		return nil, errors.New(fmt.Sprintf("Failed when get cols from excel file,err: %v", err))
 	}
 
-	if len(cols) != 2 || len(cols[0]) == 0 || len(cols[1]) == 0 {
+	if len(cols) != 3 || len(cols[0]) == 0 || len(cols[1]) == 0 {
 		return nil, errno.New(errno.WrongExcelFormat, "wrong excel format")
 	}
 
 	stuN := cols[0]
 	names := cols[1]
-	if stuN[0] != "学号" || names[0] != "姓名" {
+	phoneNumbers := cols[2]
+	if stuN[0] != "学号" || names[0] != "姓名" || phoneNumbers[0] != "手机号" {
 		return nil, errno.New(errno.WrongExcelFormat, "wrong excel format")
 	}
 
-	users := make([]*User, len(stuN)-1)
+	users := make([]*ImportUser, len(stuN)-1)
 	for i := 1; i < len(stuN); i++ {
-		users[i-1] = &User{
+		users[i-1] = &ImportUser{
 			StudentNumber: stuN[i],
 			Name:          names[i],
+			PhoneNumber:   phoneNumbers[i],
 		}
 	}
 	return users, nil
