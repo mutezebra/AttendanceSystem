@@ -2,11 +2,13 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	service "github.com/mutezebra/ClassroomRandomRollCallSystem/app/class/service"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/biz/model/api/class"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/biz/model/api/user"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/consts"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/errno"
+	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/excel"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/pack"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/repository/cache"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/repository/database"
@@ -239,5 +241,28 @@ func (usecase *ClassUsecase) GetClassTeacher(ctx context.Context, req *class.Get
 	resp = new(class.GetClassTeacherResp)
 	resp.Base = consts.DefaultBase
 	resp.Teacher = u
+	return resp, nil
+}
+
+func (usecase *ClassUsecase) ImportUserAndCreateClass(ctx context.Context, req *class.ImportUserAndCreateClassReq) (resp *class.ImportUserAndCreateClassResp, err error) {
+	defer func() {
+		pack.LogError(err)
+	}()
+	if err = usecase.svc.VerifyRequest(req); err != nil {
+		return nil, err
+	}
+
+	var users []*excel.ImportUser
+	if users, err = usecase.svc.GetUserFromExcel(ctx, req.GetFile()); err != nil {
+		return nil, errno.New(errno.GetUsersFromExcelFailed, "Get Users From Excel Failed")
+	}
+
+	if err = usecase.svc.ImportUserAndCreateClass(ctx, req.GetUID(), req.GetName(), users); err != nil {
+		fmt.Println(err)
+		return nil, errno.New(errno.ImportUserFromExcelFailed, "Import User From Excel Failed")
+	}
+
+	resp = new(class.ImportUserAndCreateClassResp)
+	resp.Base = consts.DefaultBase
 	return resp, nil
 }

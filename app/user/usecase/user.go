@@ -113,7 +113,7 @@ func (usecase *UserUsecase) Login(ctx context.Context, req *user.LoginReq) (resp
 	}
 	var uid int64
 	if uid, err = usecase.svc.FindUIDByPhoneNumber(req.GetPhoneNumber()); err != nil {
-		return nil, err
+		return nil, errno.New(errno.UnExistPhoneNumber, "手机号不存在")
 	}
 
 	var pwdDigest string

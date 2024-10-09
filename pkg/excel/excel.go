@@ -9,14 +9,10 @@ import (
 )
 
 type ImportUser struct {
+	UID           int64
 	StudentNumber string
 	Name          string
 	PhoneNumber   string
-}
-
-type ExportUser struct {
-	UID      int64
-	Password string
 }
 
 func ReadExcelToUsers(data []byte) ([]*ImportUser, error) {

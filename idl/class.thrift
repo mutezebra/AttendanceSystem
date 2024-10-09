@@ -78,6 +78,18 @@ struct ViewInvitationCodeResp {
     2: optional string InvitationCode (api.body="invitation_code")
 }
 
+struct ImportUserAndCreateClassReq {
+    1: optional i64 UID (api.body="uid");
+    2: optional string Name (api.body="name",api.form="name");
+    3: optional binary File (api.body="file")
+    4: optional string FileName (api.body="file_name")
+}
+
+struct ImportUserAndCreateClassResp {
+    1: optional base.Base Base (api.body="base");
+    2: optional string InvitationCode (api.body="invitation_code")
+}
+
 service ClassService {
     CreateClassResp CreateClass(1: CreateClassReq req) (api.post="/class/auth/create-class")
     JoinClassResp JoinClass(1: JoinClassReq req) (api.post="/class/auth/join-class")
@@ -85,4 +97,5 @@ service ClassService {
     ClassStudentListResp ClassStudentList(1: ClassStudentListReq req) (api.get="/class/auth/student-list")
     GetClassTeacherResp GetClassTeacher(1: GetClassTeacherReq req) (api.get="/class/auth/get-teacher")
     ViewInvitationCodeResp ViewInvitationCode(1: ViewInvitationCodeReq req) (api.get="/class/auth/view-invitation-code")
+    ImportUserAndCreateClassResp ImportUserAndCreateClass(1: ImportUserAndCreateClassReq req) (api.post="/class/auth/import")
 }

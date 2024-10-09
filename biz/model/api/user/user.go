@@ -828,8 +828,8 @@ type RegisterReq struct {
 	Name          *string `thrift:"Name,1,optional" form:"name" json:"name,omitempty"`
 	Password      *string `thrift:"Password,2,optional" form:"password" json:"password,omitempty"`
 	StudentNumber *string `thrift:"StudentNumber,3,optional" form:"student_number" json:"student_number,omitempty"`
-	PhoneNumber   *string `thrift:"PhoneNumber,4,optional" form:"phone_number" json:"phone_number,omitempty"`
-	VerifyCode    *string `thrift:"VerifyCode,5,optional" form:"verify_code" form:"verify_code" json:"verify_code,omitempty"`
+	PhoneNumber   *string `thrift:"PhoneNumber,4,optional" form:"phone_number" form:"phone_number" json:"phone_number,omitempty"`
+	VerifyCode    *string `thrift:"VerifyCode,5,optional" form:"verify_code" json:"verify_code,omitempty"`
 }
 
 func NewRegisterReq() *RegisterReq {
@@ -1709,7 +1709,7 @@ func (p *GetVerifyCodeResp) String() string {
 
 type LoginReq struct {
 	PhoneNumber *string `thrift:"PhoneNumber,1,optional" form:"phone_number" json:"phone_number,omitempty"`
-	Password    *string `thrift:"Password,2,optional" form:"password" json:"password,omitempty"`
+	Password    *string `thrift:"Password,2,optional" form:"password" form:"password" json:"password,omitempty"`
 }
 
 func NewLoginReq() *LoginReq {

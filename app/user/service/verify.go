@@ -51,30 +51,12 @@ func (svc *UserService) verifyStudentNumber(v string) errno.Errno {
 
 func (svc *UserService) verifyPassword(v string) errno.Errno {
 	pwd := v
-	if len(pwd) > 20 || len(pwd) < 6 {
+	if len(pwd) > 15 || len(pwd) < 6 {
 		return errno.New(errno.IllegalPasswordLen, "password`s len should be between 6 and 20")
 	}
 
 	if !svc.pwdRe.MatchString(pwd) {
 		return errno.New(errno.IllegalPassword, "password can only contain letters, numbers, underscores, and periods")
-	}
-
-	hasLower := false
-	hasUpper := false
-	for _, char := range pwd {
-		if char >= 'a' && char <= 'z' {
-			hasLower = true
-		}
-		if char >= 'A' && char <= 'Z' {
-			hasUpper = true
-		}
-		if hasLower && hasUpper {
-			break
-		}
-	}
-
-	if !hasLower || !hasUpper {
-		return errno.New(errno.IllegalPassword, "password must contain at least one uppercase letter and one lowercase letter")
 	}
 
 	return nil

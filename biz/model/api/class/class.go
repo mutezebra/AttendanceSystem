@@ -599,7 +599,7 @@ func (p *Class) String() string {
 
 type CreateClassReq struct {
 	UID  *int64  `thrift:"UID,1,optional" form:"uid" json:"uid,omitempty"`
-	Name *string `thrift:"Name,2,optional" form:"name" json:"name,omitempty"`
+	Name *string `thrift:"Name,2,optional" form:"name" form:"name" json:"name,omitempty"`
 }
 
 func NewCreateClassReq() *CreateClassReq {
@@ -2406,7 +2406,7 @@ func (p *ClassStudentListResp) String() string {
 
 type GetClassTeacherReq struct {
 	UID     *int64 `thrift:"UID,1,optional" form:"uid" json:"uid,omitempty"`
-	ClassID *int64 `thrift:"ClassID,2,optional" form:"class_id" form:"class_id" json:"class_id,omitempty"`
+	ClassID *int64 `thrift:"ClassID,2,optional" form:"class_id" json:"class_id,omitempty"`
 }
 
 func NewGetClassTeacherReq() *GetClassTeacherReq {
@@ -3227,6 +3227,533 @@ func (p *ViewInvitationCodeResp) String() string {
 
 }
 
+type ImportUserAndCreateClassReq struct {
+	UID      *int64  `thrift:"UID,1,optional" form:"uid" json:"uid,omitempty"`
+	Name     *string `thrift:"Name,2,optional" form:"name" json:"name,omitempty"`
+	File     []byte  `thrift:"File,3,optional" form:"file" json:"file,omitempty"`
+	FileName *string `thrift:"FileName,4,optional" form:"file_name" json:"file_name,omitempty"`
+}
+
+func NewImportUserAndCreateClassReq() *ImportUserAndCreateClassReq {
+	return &ImportUserAndCreateClassReq{}
+}
+
+func (p *ImportUserAndCreateClassReq) InitDefault() {
+}
+
+var ImportUserAndCreateClassReq_UID_DEFAULT int64
+
+func (p *ImportUserAndCreateClassReq) GetUID() (v int64) {
+	if !p.IsSetUID() {
+		return ImportUserAndCreateClassReq_UID_DEFAULT
+	}
+	return *p.UID
+}
+
+var ImportUserAndCreateClassReq_Name_DEFAULT string
+
+func (p *ImportUserAndCreateClassReq) GetName() (v string) {
+	if !p.IsSetName() {
+		return ImportUserAndCreateClassReq_Name_DEFAULT
+	}
+	return *p.Name
+}
+
+var ImportUserAndCreateClassReq_File_DEFAULT []byte
+
+func (p *ImportUserAndCreateClassReq) GetFile() (v []byte) {
+	if !p.IsSetFile() {
+		return ImportUserAndCreateClassReq_File_DEFAULT
+	}
+	return p.File
+}
+
+var ImportUserAndCreateClassReq_FileName_DEFAULT string
+
+func (p *ImportUserAndCreateClassReq) GetFileName() (v string) {
+	if !p.IsSetFileName() {
+		return ImportUserAndCreateClassReq_FileName_DEFAULT
+	}
+	return *p.FileName
+}
+
+var fieldIDToName_ImportUserAndCreateClassReq = map[int16]string{
+	1: "UID",
+	2: "Name",
+	3: "File",
+	4: "FileName",
+}
+
+func (p *ImportUserAndCreateClassReq) IsSetUID() bool {
+	return p.UID != nil
+}
+
+func (p *ImportUserAndCreateClassReq) IsSetName() bool {
+	return p.Name != nil
+}
+
+func (p *ImportUserAndCreateClassReq) IsSetFile() bool {
+	return p.File != nil
+}
+
+func (p *ImportUserAndCreateClassReq) IsSetFileName() bool {
+	return p.FileName != nil
+}
+
+func (p *ImportUserAndCreateClassReq) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 2:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 3:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 4:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_ImportUserAndCreateClassReq[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *ImportUserAndCreateClassReq) ReadField1(iprot thrift.TProtocol) error {
+
+	var _field *int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.UID = _field
+	return nil
+}
+func (p *ImportUserAndCreateClassReq) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field *string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.Name = _field
+	return nil
+}
+func (p *ImportUserAndCreateClassReq) ReadField3(iprot thrift.TProtocol) error {
+
+	var _field []byte
+	if v, err := iprot.ReadBinary(); err != nil {
+		return err
+	} else {
+		_field = []byte(v)
+	}
+	p.File = _field
+	return nil
+}
+func (p *ImportUserAndCreateClassReq) ReadField4(iprot thrift.TProtocol) error {
+
+	var _field *string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.FileName = _field
+	return nil
+}
+
+func (p *ImportUserAndCreateClassReq) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("ImportUserAndCreateClassReq"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+		if err = p.writeField3(oprot); err != nil {
+			fieldId = 3
+			goto WriteFieldError
+		}
+		if err = p.writeField4(oprot); err != nil {
+			fieldId = 4
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *ImportUserAndCreateClassReq) writeField1(oprot thrift.TProtocol) (err error) {
+	if p.IsSetUID() {
+		if err = oprot.WriteFieldBegin("UID", thrift.I64, 1); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteI64(*p.UID); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *ImportUserAndCreateClassReq) writeField2(oprot thrift.TProtocol) (err error) {
+	if p.IsSetName() {
+		if err = oprot.WriteFieldBegin("Name", thrift.STRING, 2); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteString(*p.Name); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *ImportUserAndCreateClassReq) writeField3(oprot thrift.TProtocol) (err error) {
+	if p.IsSetFile() {
+		if err = oprot.WriteFieldBegin("File", thrift.STRING, 3); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteBinary([]byte(p.File)); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
+func (p *ImportUserAndCreateClassReq) writeField4(oprot thrift.TProtocol) (err error) {
+	if p.IsSetFileName() {
+		if err = oprot.WriteFieldBegin("FileName", thrift.STRING, 4); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteString(*p.FileName); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+}
+
+func (p *ImportUserAndCreateClassReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("ImportUserAndCreateClassReq(%+v)", *p)
+
+}
+
+type ImportUserAndCreateClassResp struct {
+	Base           *base.Base `thrift:"Base,1,optional" form:"base" json:"base,omitempty"`
+	InvitationCode *string    `thrift:"InvitationCode,2,optional" form:"invitation_code" json:"invitation_code,omitempty"`
+}
+
+func NewImportUserAndCreateClassResp() *ImportUserAndCreateClassResp {
+	return &ImportUserAndCreateClassResp{}
+}
+
+func (p *ImportUserAndCreateClassResp) InitDefault() {
+}
+
+var ImportUserAndCreateClassResp_Base_DEFAULT *base.Base
+
+func (p *ImportUserAndCreateClassResp) GetBase() (v *base.Base) {
+	if !p.IsSetBase() {
+		return ImportUserAndCreateClassResp_Base_DEFAULT
+	}
+	return p.Base
+}
+
+var ImportUserAndCreateClassResp_InvitationCode_DEFAULT string
+
+func (p *ImportUserAndCreateClassResp) GetInvitationCode() (v string) {
+	if !p.IsSetInvitationCode() {
+		return ImportUserAndCreateClassResp_InvitationCode_DEFAULT
+	}
+	return *p.InvitationCode
+}
+
+var fieldIDToName_ImportUserAndCreateClassResp = map[int16]string{
+	1: "Base",
+	2: "InvitationCode",
+}
+
+func (p *ImportUserAndCreateClassResp) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *ImportUserAndCreateClassResp) IsSetInvitationCode() bool {
+	return p.InvitationCode != nil
+}
+
+func (p *ImportUserAndCreateClassResp) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 2:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_ImportUserAndCreateClassResp[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *ImportUserAndCreateClassResp) ReadField1(iprot thrift.TProtocol) error {
+	_field := base.NewBase()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.Base = _field
+	return nil
+}
+func (p *ImportUserAndCreateClassResp) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field *string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.InvitationCode = _field
+	return nil
+}
+
+func (p *ImportUserAndCreateClassResp) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("ImportUserAndCreateClassResp"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *ImportUserAndCreateClassResp) writeField1(oprot thrift.TProtocol) (err error) {
+	if p.IsSetBase() {
+		if err = oprot.WriteFieldBegin("Base", thrift.STRUCT, 1); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Base.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *ImportUserAndCreateClassResp) writeField2(oprot thrift.TProtocol) (err error) {
+	if p.IsSetInvitationCode() {
+		if err = oprot.WriteFieldBegin("InvitationCode", thrift.STRING, 2); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteString(*p.InvitationCode); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *ImportUserAndCreateClassResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("ImportUserAndCreateClassResp(%+v)", *p)
+
+}
+
 type ClassService interface {
 	CreateClass(ctx context.Context, req *CreateClassReq) (r *CreateClassResp, err error)
 
@@ -3239,6 +3766,8 @@ type ClassService interface {
 	GetClassTeacher(ctx context.Context, req *GetClassTeacherReq) (r *GetClassTeacherResp, err error)
 
 	ViewInvitationCode(ctx context.Context, req *ViewInvitationCodeReq) (r *ViewInvitationCodeResp, err error)
+
+	ImportUserAndCreateClass(ctx context.Context, req *ImportUserAndCreateClassReq) (r *ImportUserAndCreateClassResp, err error)
 }
 
 type ClassServiceClient struct {
@@ -3321,6 +3850,15 @@ func (p *ClassServiceClient) ViewInvitationCode(ctx context.Context, req *ViewIn
 	}
 	return _result.GetSuccess(), nil
 }
+func (p *ClassServiceClient) ImportUserAndCreateClass(ctx context.Context, req *ImportUserAndCreateClassReq) (r *ImportUserAndCreateClassResp, err error) {
+	var _args ClassServiceImportUserAndCreateClassArgs
+	_args.Req = req
+	var _result ClassServiceImportUserAndCreateClassResult
+	if err = p.Client_().Call(ctx, "ImportUserAndCreateClass", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
 
 type ClassServiceProcessor struct {
 	processorMap map[string]thrift.TProcessorFunction
@@ -3348,6 +3886,7 @@ func NewClassServiceProcessor(handler ClassService) *ClassServiceProcessor {
 	self.AddToProcessorMap("ClassStudentList", &classServiceProcessorClassStudentList{handler: handler})
 	self.AddToProcessorMap("GetClassTeacher", &classServiceProcessorGetClassTeacher{handler: handler})
 	self.AddToProcessorMap("ViewInvitationCode", &classServiceProcessorViewInvitationCode{handler: handler})
+	self.AddToProcessorMap("ImportUserAndCreateClass", &classServiceProcessorImportUserAndCreateClass{handler: handler})
 	return self
 }
 func (p *ClassServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -3639,6 +4178,54 @@ func (p *classServiceProcessorViewInvitationCode) Process(ctx context.Context, s
 		result.Success = retval
 	}
 	if err2 = oprot.WriteMessageBegin("ViewInvitationCode", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type classServiceProcessorImportUserAndCreateClass struct {
+	handler ClassService
+}
+
+func (p *classServiceProcessorImportUserAndCreateClass) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := ClassServiceImportUserAndCreateClassArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("ImportUserAndCreateClass", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := ClassServiceImportUserAndCreateClassResult{}
+	var retval *ImportUserAndCreateClassResp
+	if retval, err2 = p.handler.ImportUserAndCreateClass(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing ImportUserAndCreateClass: "+err2.Error())
+		oprot.WriteMessageBegin("ImportUserAndCreateClass", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("ImportUserAndCreateClass", thrift.REPLY, seqId); err2 != nil {
 		err = err2
 	}
 	if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -5417,5 +6004,299 @@ func (p *ClassServiceViewInvitationCodeResult) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("ClassServiceViewInvitationCodeResult(%+v)", *p)
+
+}
+
+type ClassServiceImportUserAndCreateClassArgs struct {
+	Req *ImportUserAndCreateClassReq `thrift:"req,1"`
+}
+
+func NewClassServiceImportUserAndCreateClassArgs() *ClassServiceImportUserAndCreateClassArgs {
+	return &ClassServiceImportUserAndCreateClassArgs{}
+}
+
+func (p *ClassServiceImportUserAndCreateClassArgs) InitDefault() {
+}
+
+var ClassServiceImportUserAndCreateClassArgs_Req_DEFAULT *ImportUserAndCreateClassReq
+
+func (p *ClassServiceImportUserAndCreateClassArgs) GetReq() (v *ImportUserAndCreateClassReq) {
+	if !p.IsSetReq() {
+		return ClassServiceImportUserAndCreateClassArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+var fieldIDToName_ClassServiceImportUserAndCreateClassArgs = map[int16]string{
+	1: "req",
+}
+
+func (p *ClassServiceImportUserAndCreateClassArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *ClassServiceImportUserAndCreateClassArgs) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_ClassServiceImportUserAndCreateClassArgs[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *ClassServiceImportUserAndCreateClassArgs) ReadField1(iprot thrift.TProtocol) error {
+	_field := NewImportUserAndCreateClassReq()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.Req = _field
+	return nil
+}
+
+func (p *ClassServiceImportUserAndCreateClassArgs) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("ImportUserAndCreateClass_args"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *ClassServiceImportUserAndCreateClassArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Req.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *ClassServiceImportUserAndCreateClassArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("ClassServiceImportUserAndCreateClassArgs(%+v)", *p)
+
+}
+
+type ClassServiceImportUserAndCreateClassResult struct {
+	Success *ImportUserAndCreateClassResp `thrift:"success,0,optional"`
+}
+
+func NewClassServiceImportUserAndCreateClassResult() *ClassServiceImportUserAndCreateClassResult {
+	return &ClassServiceImportUserAndCreateClassResult{}
+}
+
+func (p *ClassServiceImportUserAndCreateClassResult) InitDefault() {
+}
+
+var ClassServiceImportUserAndCreateClassResult_Success_DEFAULT *ImportUserAndCreateClassResp
+
+func (p *ClassServiceImportUserAndCreateClassResult) GetSuccess() (v *ImportUserAndCreateClassResp) {
+	if !p.IsSetSuccess() {
+		return ClassServiceImportUserAndCreateClassResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+var fieldIDToName_ClassServiceImportUserAndCreateClassResult = map[int16]string{
+	0: "success",
+}
+
+func (p *ClassServiceImportUserAndCreateClassResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *ClassServiceImportUserAndCreateClassResult) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 0:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField0(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_ClassServiceImportUserAndCreateClassResult[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *ClassServiceImportUserAndCreateClassResult) ReadField0(iprot thrift.TProtocol) error {
+	_field := NewImportUserAndCreateClassResp()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.Success = _field
+	return nil
+}
+
+func (p *ClassServiceImportUserAndCreateClassResult) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("ImportUserAndCreateClass_result"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField0(oprot); err != nil {
+			fieldId = 0
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *ClassServiceImportUserAndCreateClassResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Success.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
+}
+
+func (p *ClassServiceImportUserAndCreateClassResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("ClassServiceImportUserAndCreateClassResult(%+v)", *p)
 
 }

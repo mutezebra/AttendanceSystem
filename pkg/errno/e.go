@@ -27,6 +27,7 @@ const (
 	VerifyCodeExpired    e = 10012
 	WrongVerifyCode      e = 10013
 	WrongPassword        e = 10014
+	UnExistPhoneNumber   e = 10015
 )
 
 // class
@@ -40,6 +41,9 @@ const (
 	HaveInClass               e = 20006
 	NotClassOwner             e = 20007
 	WrongExcelFormat          e = 20008
+	UnSupportImportFormat     e = 20009
+	GetUsersFromExcelFailed   e = 20010
+	ImportUserFromExcelFailed e = 20011
 )
 
 // call

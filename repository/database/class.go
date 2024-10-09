@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/biz/model/api/class"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/biz/model/api/user"
+	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/excel"
 	"github.com/pkg/errors"
 )
 
@@ -148,4 +149,48 @@ func (repo *ClassRepository) GetTeacherInfo(ctx context.Context, classID int64) 
 		return us, errors.Wrap(err, "failed when try to find class`s teacher")
 	}
 	return us, nil
+}
+
+func (repo *ClassRepository) ImportUserAndCreateClass(ctx context.Context, classID, uid int64, className, iCode string, pwd string, users []*excel.ImportUser) error {
+	tx, err := repo.db.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return errors.Wrap(err, "failed when begin tx")
+	}
+	defer func() {
+		if err != nil {
+			newerr := tx.Rollback()
+			if newerr != nil {
+				fmt.Println("rollback failed")
+			}
+		}
+	}()
+
+	query := "INSERT INTO class(id,name,user_count,invitation_code) VALUES (?,?,?,?)"
+	if _, err = repo.db.Exec(query, classID, className, len(users), iCode); err != nil {
+		return errors.Wrap(err, "failed when create a class")
+	}
+	query = "INSERT INTO class_owner(uid, class_id) VALUES (?,?)"
+	if _, err = repo.db.Exec(query, uid, classID); err != nil {
+		return errors.Wrap(err, "failed when insert item to `class_owner`")
+	}
+
+	// create and join
+	for _, u := range users {
+		if _, err = repo.db.Exec("INSERT INTO user(id,name,student_number,avatar,phone_number,password_digest) values (?,?,?,?,?,?)",
+			u.UID, u.Name, u.StudentNumber, "avatar",
+			u.PhoneNumber, pwd,
+		); err != nil {
+			return errors.Wrap(err, "insert item to user failed")
+		}
+
+		query = "INSERT INTO user_with_class(uid, class_id,weight) VALUES (?,?,100)"
+		if _, err = tx.Exec(query, u.UID, classID); err != nil {
+			return errors.Wrap(err, fmt.Sprintf("failed when %d try join %d", u.UID, classID))
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return errors.Wrap(err, "failed when tx commit")
+	}
+	return nil
 }

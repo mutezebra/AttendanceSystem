@@ -51,3 +51,13 @@ func _getclassteacherMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _exportuserinfosreqMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _importuserandcreateclassMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

@@ -5,6 +5,7 @@ import (
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/biz/model/api/class"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/biz/model/api/user"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/consts"
+	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/excel"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/utils"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/repository/cache"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/repository/database"
@@ -40,7 +41,11 @@ func (svc *ClassService) VerifyRequest(req interface{}) error {
 	case *class.ClassStudentListReq:
 	case *class.ViewInvitationCodeReq:
 	case *class.GetClassTeacherReq:
-
+	case *class.ImportUserAndCreateClassReq:
+		req := req.(*class.ImportUserAndCreateClassReq)
+		if err := svc.verifyExcelFile(req.GetFileName()); err != nil {
+			return err
+		}
 	default:
 		return errors.Wrap(errors.New("unknown req type"), "unknown req type")
 	}
@@ -88,4 +93,19 @@ func (svc *ClassService) ClassStudentList(ctx context.Context, classID int64) ([
 
 func (svc *ClassService) GetTeacherInfo(ctx context.Context, classID int64) (*user.BaseUser, error) {
 	return svc.db.GetTeacherInfo(ctx, classID)
+}
+
+func (svc *ClassService) GetUserFromExcel(ctx context.Context, data []byte) ([]*excel.ImportUser, error) {
+	return excel.ReadExcelToUsers(data)
+}
+
+func (svc *ClassService) ImportUserAndCreateClass(ctx context.Context, uid int64, className string, users []*excel.ImportUser) error {
+	classID := snowflake.GenerateID(consts.ClassWorkerID, consts.CenterID)
+	icode := utils.GenerateCode(6)
+	pwd := "$2a$10$dh0XpDhNdm8yFEPjhiGahukXN.BLvSs.W39AhivOPw7H3CTkbyT12"
+	for _, u := range users {
+		u.UID = snowflake.GenerateID(consts.ClassWorkerID, consts.CenterID)
+	}
+
+	return svc.db.ImportUserAndCreateClass(ctx, classID, uid, className, icode, pwd, users)
 }

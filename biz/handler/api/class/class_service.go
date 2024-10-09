@@ -11,6 +11,8 @@ import (
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/biz/model/base/base"
 	consts2 "github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/consts"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/pack"
+	"io"
+	"mime/multipart"
 )
 
 // CreateClass .
@@ -165,6 +167,51 @@ func GetClassTeacher(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetClassUsecase().GetClassTeacher(ctx, &req)
 	if err != nil {
 		resp = new(class.GetClassTeacherResp)
+		errno := pack.ProcessError(err)
+		code, msg := errno.Code(), errno.Error()
+		resp.Base = &base.Base{Code: &code, Msg: &msg}
+		c.JSON(consts.StatusInternalServerError, resp)
+		return
+	}
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// ImportUserAndCreateClass .
+// @router /class/auth/import [POST]
+func ImportUserAndCreateClass(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req class.ImportUserAndCreateClassReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	var fh *multipart.FileHeader
+	fh, err = c.FormFile("users")
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+	req.FileName = &fh.Filename
+
+	var f multipart.File
+	f, err = fh.Open()
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+	buf, _ := io.ReadAll(f)
+	_ = f.Close()
+	req.File = buf
+
+	uid := ctx.Value(consts2.UIDKey).(int64)
+	req.UID = &uid
+
+	resp, err := usecase.GetClassUsecase().ImportUserAndCreateClass(ctx, &req)
+	if err != nil {
+		resp = new(class.ImportUserAndCreateClassResp)
 		errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
