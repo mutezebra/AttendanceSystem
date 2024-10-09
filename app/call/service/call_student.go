@@ -25,9 +25,9 @@ func (svc *CallService) CallStudents(ctx context.Context, event *call.CallEvent,
 }
 
 func (svc *CallService) RandomCallUser(ctx context.Context, items map[int64]int, callNumber int, event *call.CallEvent) error {
-	itemList := make([]weightedrand.Item, 0, len(items))
+	itemList := make([]*weightedrand.Item, 0, len(items))
 	for k, v := range items {
-		itemList = append(itemList, weightedrand.Item{Key: k, Weight: v})
+		itemList = append(itemList, &weightedrand.Item{Key: k, Weight: v})
 	}
 	keys, err := weightedrand.WeightedRandom(itemList, callNumber)
 	if err != nil {

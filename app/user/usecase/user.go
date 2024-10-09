@@ -111,6 +111,11 @@ func (usecase *UserUsecase) Login(ctx context.Context, req *user.LoginReq) (resp
 	if err = usecase.svc.VerifyRequest(req); err != nil {
 		return nil, err
 	}
+	var uid int64
+	if uid, err = usecase.svc.FindUIDByPhoneNumber(req.GetPhoneNumber()); err != nil {
+		return nil, err
+	}
+
 	var pwdDigest string
 	if pwdDigest, err = usecase.svc.FindUserPassword(req.GetPhoneNumber()); err != nil {
 		return nil, err
@@ -118,11 +123,6 @@ func (usecase *UserUsecase) Login(ctx context.Context, req *user.LoginReq) (resp
 
 	if ok := usecase.svc.CheckPassword(req.GetPassword(), pwdDigest); !ok {
 		return nil, errno.New(errno.WrongPassword, "wrong password")
-	}
-
-	var uid int64
-	if uid, err = usecase.svc.FindUIDByPhoneNumber(req.GetPhoneNumber()); err != nil {
-		return nil, err
 	}
 
 	var token string

@@ -50,9 +50,9 @@ func (svc *UserService) VerifyRequest(req interface{}) error {
 		if err := svc.verifyStudentNumber(req.GetStudentNumber()); err != nil {
 			return err
 		}
-		if err := svc.verifyPassword(req.GetPassword()); err != nil {
-			return err
-		}
+		//if err := svc.verifyPassword(req.GetPassword()); err != nil {
+		//	return err
+		//}
 		if err := svc.verifyVerifyCode(req.GetVerifyCode()); err != nil {
 			return err
 		}

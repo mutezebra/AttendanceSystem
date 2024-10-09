@@ -88,7 +88,7 @@ func (repo *ClassRepository) JoinClass(ctx context.Context, uid, classID int64) 
 		}
 	}()
 
-	query := "INSERT INTO user_with_class(uid, class_id) VALUES (?,?)"
+	query := "INSERT INTO user_with_class(uid, class_id,weight) VALUES (?,?,100)"
 	if _, err = tx.Exec(query, uid, classID); err != nil {
 		return errors.Wrap(err, fmt.Sprintf("failed when %d try join %d", uid, classID))
 	}

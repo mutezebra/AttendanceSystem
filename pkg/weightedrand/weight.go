@@ -11,7 +11,7 @@ type Item struct {
 	Weight int
 }
 
-func WeightedRandom(items []Item, count int) ([]int64, error) {
+func WeightedRandom(items []*Item, count int) ([]int64, error) {
 	totalWeight := 0
 	for _, item := range items {
 		totalWeight += item.Weight
@@ -20,18 +20,34 @@ func WeightedRandom(items []Item, count int) ([]int64, error) {
 		return nil, errors.Wrap(fmt.Errorf("total weight is 0"), fmt.Sprintf("items: %v", items))
 	}
 
-	result := make([]int64, 0, count)
-
-	for i := 0; i < count; i++ {
+	originSize := len(items)
+	for i := originSize; i > count; i-- {
 		r := rand.Intn(totalWeight)
-		for _, item := range items {
+		for index, item := range items {
 			if r < item.Weight {
-				result = append(result, item.Key)
+				items = removeKey(items, index)
 				break
 			}
 			r -= item.Weight
 		}
 	}
 
+	result := make([]int64, count)
+	for i := 0; i < count; i++ {
+		result[i] = items[i].Key
+	}
+
 	return result, nil
+}
+
+func subTotalWeight(origin, num int) int {
+	return origin - num
+}
+
+func removeKey(items []*Item, index int) []*Item {
+	if index < 0 || index >= len(items) {
+		// 索引越界，直接返回原切片
+		return items
+	}
+	return append(items[:index], items[index+1:]...)
 }
