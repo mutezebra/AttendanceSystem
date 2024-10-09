@@ -39,6 +39,7 @@ const (
 	NotClassMember            e = 20005
 	HaveInClass               e = 20006
 	NotClassOwner             e = 20007
+	WrongExcelFormat          e = 20008
 )
 
 // call
