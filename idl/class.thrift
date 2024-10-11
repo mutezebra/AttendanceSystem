@@ -52,10 +52,18 @@ struct ClassStudentListReq { // only teacher can
     2: optional i64 ClassID (api.body="class_id",api.form="class_id");
 }
 
+struct StudentFormat {
+    1: optional string StudentNumber (api.body="student_number")
+    2: optional string Name (api.body="name")
+    3: optional string Status (api.body="status")
+    4: optional i32 Score (api.body="point")
+    5: optional i64 UID (api.body="uid")
+}
+
 struct ClassStudentListResp {
     1: optional base.Base Base (api.body="base");
     2: optional i32 UserCount (api.body="user_count")
-    3: optional list<user.BaseUser> Students (api.body="students");
+    3: optional list<StudentFormat> Students (api.body="students")
 }
 
 struct GetClassTeacherReq {
@@ -88,14 +96,28 @@ struct ImportUserAndCreateClassReq {
 struct ImportUserAndCreateClassResp {
     1: optional base.Base Base (api.body="base");
     2: optional string InvitationCode (api.body="invitation_code")
+    3: optional i64 ClassID (api.body="class_id")
+}
+
+struct ChangePointReq {
+    1: optional i64 UID (api.body="uid");
+    2: optional i64 ClassID (api.body="class_id",api.form="class_id");
+    3: optional i64 StuUID (api.body="stu_uid",api.form="stu_uid");
+    4: optional i32 Point (api.body="point",api.form="point")
+    5: optional i8  Action  (api.body="action",api.form="action")
+}
+
+struct ChangePointResp {
+    1: optional base.Base Base (api.body="base");
 }
 
 service ClassService {
     CreateClassResp CreateClass(1: CreateClassReq req) (api.post="/class/auth/create-class")
     JoinClassResp JoinClass(1: JoinClassReq req) (api.post="/class/auth/join-class")
     ClassListResp ClassList(1: ClassListReq req) (api.get="/class/auth/class-list")
-    ClassStudentListResp ClassStudentList(1: ClassStudentListReq req) (api.get="/class/auth/student-list")
+    ClassStudentListResp ClassStudentList(1: ClassStudentListReq req) (api.post="/class/auth/student-list")
     GetClassTeacherResp GetClassTeacher(1: GetClassTeacherReq req) (api.get="/class/auth/get-teacher")
     ViewInvitationCodeResp ViewInvitationCode(1: ViewInvitationCodeReq req) (api.get="/class/auth/view-invitation-code")
     ImportUserAndCreateClassResp ImportUserAndCreateClass(1: ImportUserAndCreateClassReq req) (api.post="/class/auth/import")
+    ChangePointResp ChangePoint(1: ChangePointReq req) (api.post="/class/auth/change-point")
 }

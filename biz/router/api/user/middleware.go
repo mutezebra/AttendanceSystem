@@ -40,3 +40,13 @@ func _userMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _changepasswordMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userinfoMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

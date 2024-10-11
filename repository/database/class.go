@@ -123,9 +123,9 @@ func (repo *ClassRepository) ClassList(ctx context.Context, uid int64) (classes 
 	return classes, nil
 }
 
-func (repo *ClassRepository) ClassStudentList(ctx context.Context, classID int64) (users []*user.BaseUser, err error) {
-	users = make([]*user.BaseUser, 0)
-	query := "SELECT student_number,name,avatar,id FROM user WHERE id in (SELECT uid FROM user_with_class WHERE class_id=?)"
+func (repo *ClassRepository) ClassStudentList(ctx context.Context, classID int64) (users []*class.StudentFormat, err error) {
+	users = make([]*class.StudentFormat, 0)
+	query := "SELECT u.student_number,u.name,uc.weight,u.id FROM user u JOIN user_with_class uc ON u.id=uc.uid WHERE uc.class_id=?"
 	var rows *sql.Rows
 	if rows, err = repo.db.Query(query, classID); err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, errors.Wrap(err, fmt.Sprintf("failed when query %d`s students", classID))
@@ -133,8 +133,8 @@ func (repo *ClassRepository) ClassStudentList(ctx context.Context, classID int64
 	defer rows.Close()
 
 	for rows.Next() {
-		var u user.BaseUser
-		if err = rows.Scan(&u.StudentNumber, &u.Name, &u.Avatar, &u.UID); err != nil {
+		var u class.StudentFormat
+		if err = rows.Scan(&u.StudentNumber, &u.Name, &u.Score, &u.UID); err != nil {
 			return nil, errors.Wrap(err, "failed when scan u to user")
 		}
 		users = append(users, &u)
@@ -151,7 +151,7 @@ func (repo *ClassRepository) GetTeacherInfo(ctx context.Context, classID int64) 
 	return us, nil
 }
 
-func (repo *ClassRepository) ImportUserAndCreateClass(ctx context.Context, classID, uid int64, className, iCode string, pwd string, users []*excel.ImportUser) error {
+func (repo *ClassRepository) ImportUserAndCreateClass(ctx context.Context, classID int64, uid int64, className, iCode string, pwd string, users []*excel.ImportUser) error {
 	tx, err := repo.db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return errors.Wrap(err, "failed when begin tx")
@@ -193,4 +193,72 @@ func (repo *ClassRepository) ImportUserAndCreateClass(ctx context.Context, class
 		return errors.Wrap(err, "failed when tx commit")
 	}
 	return nil
+}
+
+func (repo *ClassRepository) RecentEvent(ctx context.Context, classID int64) (int64, error) {
+	var eventID int64
+	if err := repo.db.QueryRow("SELECT id FROM call_event WHERE class_id=? ORDER BY id DESC LIMIT 1", classID).Scan(&eventID); err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return 0, errors.Wrap(err, "failed when get recent event")
+	}
+	return eventID, nil
+}
+
+func (repo *ClassRepository) GetUnDoneUiDS(ctx context.Context, eventID int64) ([]int64, error) {
+	query := `SELECT uid FROM call_event_with_user WHERE call_event_id = ? AND done = 0`
+	rows, err := repo.db.QueryContext(ctx, query, eventID)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get done uids")
+	}
+	defer rows.Close()
+
+	var uids []int64
+	for rows.Next() {
+		var uid int64
+		if err = rows.Scan(&uid); err != nil {
+			return nil, errors.Wrap(err, "failed to scan uid")
+		}
+		uids = append(uids, uid)
+	}
+	return uids, nil
+}
+
+func (repo *ClassRepository) WhetherUserHaveClass(ctx context.Context, uid int64) (int64, error) {
+	var classID int64
+	query := "SELECT class_id FROM class_owner WHERE uid=? ORDER BY class_id DESC LIMIT 1"
+	if err := repo.db.QueryRow(query, uid).Scan(&classID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, nil
+		}
+		return 0, errors.Wrap(err, "failed when query user have class")
+	}
+	return classID, nil
+}
+
+func (repo *ClassRepository) WhetherUserInAClass(ctx context.Context, uid int64) (int64, error) {
+	var classID int64
+	query := "SELECT class_id FROM user_with_class WHERE uid=? ORDER BY class_id DESC LIMIT 1"
+	if err := repo.db.QueryRow(query, uid).Scan(&classID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, nil
+		}
+		return 0, errors.Wrap(err, "failed when query user in a class")
+	}
+	return classID, nil
+}
+
+func (repo *ClassRepository) ChangePoint(ctx context.Context, uid, classID int64, point int32) error {
+	query := "UPDATE user_with_class SET weight=weight+? WHERE uid=? AND class_id=?"
+	if _, err := repo.db.Exec(query, point, uid, classID); err != nil {
+		return errors.Wrap(err, "failed when change point")
+	}
+	return nil
+}
+
+func (repo *ClassRepository) FindWeightByUIDANDClassID(ctx context.Context, uid, classID int64) (int32, error) {
+	var weight int32
+	query := "SELECT weight FROM user_with_class WHERE uid=? AND class_id=?"
+	if err := repo.db.QueryRow(query, uid, classID).Scan(&weight); err != nil {
+		return 0, errors.Wrap(err, "failed when find weight")
+	}
+	return weight, nil
 }

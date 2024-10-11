@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/biz/model/api/call"
+	"github.com/mutezebra/ClassroomRandomRollCallSystem/biz/model/api/class"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/biz/model/api/user"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/consts"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/repository/cache"
@@ -50,9 +51,9 @@ func (svc *CallService) VerifyReq(req interface{}) error {
 		if err := svc.verifyCallNumber(req.GetCallNumber()); err != nil {
 			return err
 		}
-		if err := svc.verifyDeadline(req.GetDeadline()); err != nil {
-			return err
-		}
+		//if err := svc.verifyDeadline(req.GetDeadline()); err != nil {
+		//	return err
+		//}
 	case *call.HistoryCallEventReq:
 	default:
 		return errors.Wrap(fmt.Errorf("unknown request type"), "")
@@ -68,7 +69,7 @@ func (svc *CallService) EventExist(ctx context.Context, eventID int64) (bool, er
 	return svc.db.EventExist(ctx, eventID)
 }
 
-func (svc *CallService) GetAllClassStudents(ctx context.Context, classID int64) ([]*user.BaseUser, error) {
+func (svc *CallService) GetAllClassStudents(ctx context.Context, classID int64) ([]*class.StudentFormat, error) {
 	return svc.classDB.ClassStudentList(ctx, classID)
 }
 
@@ -119,4 +120,24 @@ func (svc *CallService) WhetherUserInClass(ctx context.Context, uid, classID int
 
 func (svc *CallService) GetBaseUserByID(ctx context.Context, uids []int64) ([]*user.BaseUser, error) {
 	return svc.userDB.FindUserByUID(uids)
+}
+
+func (svc *CallService) WhetherUserHaveClass(ctx context.Context, uid int64) (bool, int64, error) {
+	classID, err := svc.classDB.WhetherUserHaveClass(ctx, uid)
+	return classID != 0, classID, err
+}
+
+func (svc *CallService) WhetherUserInAClass(ctx context.Context, uid int64) (bool, int64, error) {
+	classID, err := svc.classDB.WhetherUserInAClass(ctx, uid)
+
+	return classID != 0, classID, err
+}
+
+func (svc *CallService) GetEventIDFromClass(classID int64) int64 {
+	svc.mu.Lock()
+	defer svc.mu.Unlock()
+	if event, ok := svc.unDoneEvents[classID]; ok {
+		return event.GetID()
+	}
+	return 0
 }

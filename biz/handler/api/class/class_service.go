@@ -32,10 +32,10 @@ func CreateClass(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetClassUsecase().CreateClass(ctx, &req)
 	if err != nil {
 		resp = new(class.CreateClassResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
 		return
 	}
 
@@ -59,10 +59,10 @@ func JoinClass(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetClassUsecase().JoinClass(ctx, &req)
 	if err != nil {
 		resp = new(class.JoinClassResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
 		return
 	}
 
@@ -86,10 +86,10 @@ func ClassList(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetClassUsecase().ClassList(ctx, &req)
 	if err != nil {
 		resp = new(class.ClassListResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
 		return
 	}
 
@@ -113,10 +113,10 @@ func ClassStudentList(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetClassUsecase().ClassStudentList(ctx, &req)
 	if err != nil {
 		resp = new(class.ClassStudentListResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
 		return
 	}
 
@@ -140,10 +140,10 @@ func ViewInvitationCode(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetClassUsecase().ViewInvitationCode(ctx, &req)
 	if err != nil {
 		resp = new(class.ViewInvitationCodeResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
 		return
 	}
 
@@ -167,10 +167,10 @@ func GetClassTeacher(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetClassUsecase().GetClassTeacher(ctx, &req)
 	if err != nil {
 		resp = new(class.GetClassTeacherResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
 		return
 	}
 
@@ -189,7 +189,7 @@ func ImportUserAndCreateClass(ctx context.Context, c *app.RequestContext) {
 	}
 
 	var fh *multipart.FileHeader
-	fh, err = c.FormFile("users")
+	fh, err = c.FormFile("file")
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
@@ -212,10 +212,37 @@ func ImportUserAndCreateClass(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetClassUsecase().ImportUserAndCreateClass(ctx, &req)
 	if err != nil {
 		resp = new(class.ImportUserAndCreateClassResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
+		return
+	}
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// ChangePoint .
+// @router /class/auth/change-point [POST]
+func ChangePoint(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req class.ChangePointReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	uid := ctx.Value(consts2.UIDKey).(int64)
+	req.UID = &uid
+
+	resp, err := usecase.GetClassUsecase().ChangePoint(ctx, &req)
+	if err != nil {
+		resp = new(class.ChangePointResp)
+		httpcode, errno := pack.ProcessError(err)
+		code, msg := errno.Code(), errno.Error()
+		resp.Base = &base.Base{Code: &code, Msg: &msg}
+		c.JSON(httpcode, resp)
 		return
 	}
 

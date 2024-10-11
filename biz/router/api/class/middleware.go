@@ -61,3 +61,8 @@ func _importuserandcreateclassMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _changepointMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

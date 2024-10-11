@@ -1881,7 +1881,7 @@ func (p *DoCallEventResp) String() string {
 
 type UndoCallEventsReq struct {
 	UID     *int64 `thrift:"UID,1,optional" form:"uid" json:"uid,omitempty"`
-	ClassID *int64 `thrift:"ClassID,2,optional" form:"class_id" json:"class_id,omitempty"`
+	ClassID *int64 `thrift:"ClassID,2,optional" form:"class_id" form:"class_id" json:"class_id,omitempty"`
 }
 
 func NewUndoCallEventsReq() *UndoCallEventsReq {
@@ -2348,10 +2348,12 @@ func (p *UndoCallEventsResp) String() string {
 
 type RandomCallReq struct {
 	UID           *int64  `thrift:"UID,1,optional" form:"uid" json:"uid,omitempty"`
-	ClassID       *int64  `thrift:"ClassID,2,optional" form:"class_id" json:"class_id,omitempty"`
+	ClassID       *int64  `thrift:"ClassID,2,optional" form:"class_id" form:"class_id" json:"class_id,omitempty"`
 	CallNumber    *int64  `thrift:"CallNumber,3,optional" form:"call_number" json:"call_number,omitempty"`
 	Deadline      *int16  `thrift:"Deadline,4,optional" form:"deadline" json:"deadline,omitempty"`
 	CallEventName *string `thrift:"CallEventName,5,optional" form:"call_event_name" json:"call_event_name,omitempty"`
+	Action        *int8   `thrift:"Action,6,optional" form:"action" form:"action" json:"action,omitempty"`
+	Number        *int8   `thrift:"Number,7,optional" form:"number" json:"number,omitempty"`
 }
 
 func NewRandomCallReq() *RandomCallReq {
@@ -2406,12 +2408,32 @@ func (p *RandomCallReq) GetCallEventName() (v string) {
 	return *p.CallEventName
 }
 
+var RandomCallReq_Action_DEFAULT int8
+
+func (p *RandomCallReq) GetAction() (v int8) {
+	if !p.IsSetAction() {
+		return RandomCallReq_Action_DEFAULT
+	}
+	return *p.Action
+}
+
+var RandomCallReq_Number_DEFAULT int8
+
+func (p *RandomCallReq) GetNumber() (v int8) {
+	if !p.IsSetNumber() {
+		return RandomCallReq_Number_DEFAULT
+	}
+	return *p.Number
+}
+
 var fieldIDToName_RandomCallReq = map[int16]string{
 	1: "UID",
 	2: "ClassID",
 	3: "CallNumber",
 	4: "Deadline",
 	5: "CallEventName",
+	6: "Action",
+	7: "Number",
 }
 
 func (p *RandomCallReq) IsSetUID() bool {
@@ -2432,6 +2454,14 @@ func (p *RandomCallReq) IsSetDeadline() bool {
 
 func (p *RandomCallReq) IsSetCallEventName() bool {
 	return p.CallEventName != nil
+}
+
+func (p *RandomCallReq) IsSetAction() bool {
+	return p.Action != nil
+}
+
+func (p *RandomCallReq) IsSetNumber() bool {
+	return p.Number != nil
 }
 
 func (p *RandomCallReq) Read(iprot thrift.TProtocol) (err error) {
@@ -2488,6 +2518,22 @@ func (p *RandomCallReq) Read(iprot thrift.TProtocol) (err error) {
 		case 5:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField5(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 6:
+			if fieldTypeId == thrift.BYTE {
+				if err = p.ReadField6(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 7:
+			if fieldTypeId == thrift.BYTE {
+				if err = p.ReadField7(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
@@ -2577,6 +2623,28 @@ func (p *RandomCallReq) ReadField5(iprot thrift.TProtocol) error {
 	p.CallEventName = _field
 	return nil
 }
+func (p *RandomCallReq) ReadField6(iprot thrift.TProtocol) error {
+
+	var _field *int8
+	if v, err := iprot.ReadByte(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.Action = _field
+	return nil
+}
+func (p *RandomCallReq) ReadField7(iprot thrift.TProtocol) error {
+
+	var _field *int8
+	if v, err := iprot.ReadByte(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.Number = _field
+	return nil
+}
 
 func (p *RandomCallReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
@@ -2602,6 +2670,14 @@ func (p *RandomCallReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField5(oprot); err != nil {
 			fieldId = 5
+			goto WriteFieldError
+		}
+		if err = p.writeField6(oprot); err != nil {
+			fieldId = 6
+			goto WriteFieldError
+		}
+		if err = p.writeField7(oprot); err != nil {
+			fieldId = 7
 			goto WriteFieldError
 		}
 	}
@@ -2715,6 +2791,44 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
+}
+
+func (p *RandomCallReq) writeField6(oprot thrift.TProtocol) (err error) {
+	if p.IsSetAction() {
+		if err = oprot.WriteFieldBegin("Action", thrift.BYTE, 6); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteByte(*p.Action); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
+}
+
+func (p *RandomCallReq) writeField7(oprot thrift.TProtocol) (err error) {
+	if p.IsSetNumber() {
+		if err = oprot.WriteFieldBegin("Number", thrift.BYTE, 7); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteByte(*p.Number); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 7 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 7 end error: ", p), err)
 }
 
 func (p *RandomCallReq) String() string {

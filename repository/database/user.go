@@ -48,6 +48,16 @@ func (repo *UserRepository) FindUserPassword(phoneNumber string) (string, error)
 	return pwd, nil
 }
 
+func (repo *UserRepository) FindUserPasswordByUID(uid int64) (string, error) {
+	var pwd string
+	query := "SELECT password_digest from user WHERE id=? LIMIT 1"
+	err := repo.db.QueryRow(query, uid).Scan(&pwd)
+	if err != nil {
+		return "", errors.Wrap(err, "failed when query pwd base uid")
+	}
+	return pwd, nil
+}
+
 func (repo *UserRepository) FindUIDByPhoneNumber(phoneNumber string) (int64, error) {
 	var uid int64
 	query := "SELECT id from user WHERE phone_number=? LIMIT 1"
@@ -75,4 +85,21 @@ func (repo *UserRepository) FindUserByUID(uids []int64) (users []*user.BaseUser,
 		users = append(users, &u)
 	}
 	return users, nil
+}
+
+func (repo *UserRepository) ChangePassword(uid int64, pwd string) error {
+	query := "UPDATE user SET password_digest=? WHERE id=?"
+	if _, err := repo.db.Exec(query, pwd, uid); err != nil {
+		return errors.Wrap(err, "failed when change password")
+	}
+	return nil
+}
+
+func (repo *UserRepository) FindUserByID(uid int64) (*user.User, error) {
+	var u user.User
+	query := "SELECT id,name,student_number,avatar,phone_number FROM user WHERE id=? LIMIT 1"
+	if err := repo.db.QueryRow(query, uid).Scan(&u.ID, &u.Name, &u.StudentNumber, &u.Avatar, &u.PhoneNumber); err != nil {
+		return nil, errors.Wrap(err, "failed when find user by id")
+	}
+	return &u, nil
 }

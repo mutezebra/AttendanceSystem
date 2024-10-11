@@ -21,12 +21,13 @@ func Register(r *server.Hertz) {
 		_class := root.Group("/class", _classMw()...)
 		{
 			_auth := _class.Group("/auth", _authMw()...)
+			_auth.POST("/change-point", append(_changepointMw(), class.ChangePoint)...)
 			_auth.GET("/class-list", append(_classlistMw(), class.ClassList)...)
 			_auth.POST("/create-class", append(_createclassMw(), class.CreateClass)...)
 			_auth.GET("/get-teacher", append(_getclassteacherMw(), class.GetClassTeacher)...)
 			_auth.POST("/import", append(_importuserandcreateclassMw(), class.ImportUserAndCreateClass)...)
 			_auth.POST("/join-class", append(_joinclassMw(), class.JoinClass)...)
-			_auth.GET("/student-list", append(_classstudentlistMw(), class.ClassStudentList)...)
+			_auth.POST("/student-list", append(_classstudentlistMw(), class.ClassStudentList)...)
 			_auth.GET("/view-invitation-code", append(_viewinvitationcodeMw(), class.ViewInvitationCode)...)
 		}
 	}

@@ -24,16 +24,12 @@ func (svc *CallService) CallStudents(ctx context.Context, event *call.CallEvent,
 	return nil
 }
 
-func (svc *CallService) RandomCallUser(ctx context.Context, items map[int64]int, callNumber int, event *call.CallEvent) error {
+func (svc *CallService) RandomCallUser(ctx context.Context, items map[int64]int, callCount int, action, number int8) ([]int64, error) {
 	itemList := make([]*weightedrand.Item, 0, len(items))
 	for k, v := range items {
 		itemList = append(itemList, &weightedrand.Item{Key: k, Weight: v})
 	}
-	keys, err := weightedrand.WeightedRandom(itemList, callNumber)
-	if err != nil {
-		return err
-	}
-	return svc.CallStudents(ctx, event, keys)
+	return weightedrand.WeightedRandom(itemList, callCount, action, number)
 }
 
 func (svc *CallService) DoCallEvent(ctx context.Context, uid, classID, eventID int64) error {

@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS user (
     name varchar(255) NOT NULL DEFAULT '' COMMENT '用户名称',
     student_number varchar(255) NOT NULL DEFAULT '' COMMENT '用户学号',
     avatar varchar(255) NOT NULL DEFAULT '' COMMENT '用户头像的相对路径',
-    phone_number varchar(255) NOT NULL DEFAULT '' COMMENT '用户头像的手机号',
+    phone_number varchar(255) NOT NULL Unique DEFAULT '' COMMENT '用户头像的手机号',
     password_digest varchar(255) NOT NULL DEFAULT '' COMMENT '加密后的密码',
     PRIMARY KEY pk_user(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户基础表' ;

@@ -31,10 +31,10 @@ func CallAllStudent(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetCallUsecase().CallAllStudent(ctx, &req)
 	if err != nil {
 		resp = new(call.CallAllStudentResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
 		return
 	}
 
@@ -58,10 +58,10 @@ func DoCallEvent(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetCallUsecase().DoCallEvent(ctx, &req)
 	if err != nil {
 		resp = new(call.DoCallEventResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
 		return
 	}
 
@@ -85,10 +85,10 @@ func UndoCallEvents(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetCallUsecase().UndoCallEvents(ctx, &req)
 	if err != nil {
 		resp = new(call.UndoCallEventsResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
 		return
 	}
 
@@ -112,10 +112,10 @@ func RandomCall(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetCallUsecase().RandomCall(ctx, &req)
 	if err != nil {
 		resp = new(call.RandomCallResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
 		return
 	}
 
@@ -139,10 +139,10 @@ func HistoryCallEvent(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetCallUsecase().HistoryCallEvent(ctx, &req)
 	if err != nil {
 		resp = new(call.HistoryCallEventResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
 		return
 	}
 

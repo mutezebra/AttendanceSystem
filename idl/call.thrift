@@ -62,6 +62,8 @@ struct RandomCallReq {
     3: optional i64 CallNumber (api.body="call_number",api.form="call_number");
     4: optional i16 Deadline (api.body="deadline",api.form="deadline");
     5: optional string CallEventName (api.body="call_event_name",api.form="call_event_name");
+    6: optional i8 Action (api.body="action",api.form="action")
+    7: optional i8 Number (api.body="number",api.form="number")
 }
 
 struct RandomCallResp {

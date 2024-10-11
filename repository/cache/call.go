@@ -56,6 +56,7 @@ func (cache *CallCache) WhetherUserHaveDone(ctx context.Context, classID, uid in
 	return exist, nil
 }
 
+// GetUidDiff returns the difference between the undo set and the do set.也就是获得还未做的人
 func (cache *CallCache) GetUidDiff(ctx context.Context, classID int64) ([]int64, error) {
 	var s []int64
 	if err := cache.c.SDiff(ctx, fmt.Sprintf("%s:%d", consts.CallEventUndoKey, classID), fmt.Sprintf("%s:%d", consts.CallEventDoKey, classID)).ScanSlice(&s); err != nil {
@@ -64,6 +65,7 @@ func (cache *CallCache) GetUidDiff(ctx context.Context, classID int64) ([]int64,
 	return s, nil
 }
 
+// GetUidInter returns the intersection between the undo set and the do set.也就是获得已经做了的人
 func (cache *CallCache) GetUidInter(ctx context.Context, classID int64) ([]int64, error) {
 	var s []int64
 	if err := cache.c.SInter(ctx, fmt.Sprintf("%s:%d", consts.CallEventUndoKey, classID), fmt.Sprintf("%s:%d", consts.CallEventDoKey, classID)).ScanSlice(&s); err != nil {

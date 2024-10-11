@@ -20,13 +20,13 @@ func LogError(err error) {
 	}
 }
 
-func ProcessError(err error) errno.Errno {
+func ProcessError(err error) (int, errno.Errno) {
 	if err == nil {
-		return errno.Success
+		return 200, errno.Success
 	}
 	var e errno.Errno
 	if !errors.As(err, &e) {
-		return errno.Unknown
+		return 500, errno.Unknown
 	}
-	return e
+	return 200, e
 }

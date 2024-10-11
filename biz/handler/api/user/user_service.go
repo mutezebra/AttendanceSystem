@@ -9,6 +9,7 @@ import (
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/app/user/usecase"
 	user "github.com/mutezebra/ClassroomRandomRollCallSystem/biz/model/api/user"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/biz/model/base/base"
+	consts2 "github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/consts"
 	"github.com/mutezebra/ClassroomRandomRollCallSystem/pkg/pack"
 )
 
@@ -26,10 +27,10 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetUserUsecase().Register(ctx, &req)
 	if err != nil {
 		resp = new(user.RegisterResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
 		return
 	}
 
@@ -50,10 +51,10 @@ func GetVerifyCode(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetUserUsecase().GetVerifyCode(ctx, &req)
 	if err != nil {
 		resp = new(user.GetVerifyCodeResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
 		return
 	}
 
@@ -74,10 +75,64 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	resp, err := usecase.GetUserUsecase().Login(ctx, &req)
 	if err != nil {
 		resp = new(user.LoginResp)
-		errno := pack.ProcessError(err)
+		httpcode, errno := pack.ProcessError(err)
 		code, msg := errno.Code(), errno.Error()
 		resp.Base = &base.Base{Code: &code, Msg: &msg}
-		c.JSON(consts.StatusInternalServerError, resp)
+		c.JSON(httpcode, resp)
+		return
+	}
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// ChangePassword .
+// @router /user/auth/change-password [POST]
+func ChangePassword(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req user.ChangePasswordReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	uid := ctx.Value(consts2.UIDKey).(int64)
+	req.UID = &uid
+
+	resp, err := usecase.GetUserUsecase().ChangePassword(ctx, &req)
+	if err != nil {
+		resp = new(user.ChangePasswordResp)
+		httpcode, errno := pack.ProcessError(err)
+		code, msg := errno.Code(), errno.Error()
+		resp.Base = &base.Base{Code: &code, Msg: &msg}
+		c.JSON(httpcode, resp)
+		return
+	}
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// UserInfo .
+// @router /user/info [POST]
+func UserInfo(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req user.UserInfoReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	uid := ctx.Value(consts2.UIDKey).(int64)
+	req.UID = &uid
+
+	resp, err := usecase.GetUserUsecase().UserInfo(ctx, &req)
+	if err != nil {
+		resp = new(user.UserInfoResp)
+		httpcode, errno := pack.ProcessError(err)
+		code, msg := errno.Code(), errno.Error()
+		resp.Base = &base.Base{Code: &code, Msg: &msg}
+		c.JSON(httpcode, resp)
 		return
 	}
 

@@ -135,3 +135,54 @@ func (usecase *UserUsecase) Login(ctx context.Context, req *user.LoginReq) (resp
 	resp.Token = &token
 	return resp, nil
 }
+
+func (usecase *UserUsecase) ChangePassword(ctx context.Context, req *user.ChangePasswordReq) (resp *user.ChangePasswordResp, err error) {
+	defer func() {
+		pack.LogError(err)
+	}()
+
+	if err = usecase.svc.VerifyRequest(req); err != nil {
+		return nil, err
+	}
+
+	var pwdDigest string
+	if pwdDigest, err = usecase.svc.FindUserPasswordByID(req.GetUID()); err != nil {
+		return nil, err
+	}
+
+	if ok := usecase.svc.CheckPassword(req.GetOldPassword(), pwdDigest); !ok {
+		return nil, errno.New(errno.WrongPassword, "wrong password")
+	}
+
+	if err = usecase.svc.ChangePassword(req.GetUID(), req.GetNewPassword()); err != nil {
+		return nil, errno.New(errno.ChangePasswordFailed, "change password failed")
+	}
+	resp = new(user.ChangePasswordResp)
+	resp.Base = consts.DefaultBase
+	return resp, nil
+}
+
+func (usecase *UserUsecase) UserInfo(ctx context.Context, req *user.UserInfoReq) (resp *user.UserInfoResp, err error) {
+	defer func() {
+		pack.LogError(err)
+	}()
+
+	var u *user.User
+	if u, err = usecase.svc.FindUserByID(req.GetUID()); err != nil {
+		return nil, err
+	}
+
+	var weight int32
+	if weight, err = usecase.svc.GetWeightByUID(req.GetUID()); err != nil {
+		return nil, err
+	}
+
+	resp = new(user.UserInfoResp)
+	resp.Base = consts.DefaultBase
+	resp.UID = u.ID
+	resp.Name = u.Name
+	resp.StudentNumber = u.StudentNumber
+	resp.PhoneNumber = u.PhoneNumber
+	resp.Point = &weight
+	return resp, nil
+}

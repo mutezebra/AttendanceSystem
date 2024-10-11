@@ -22,5 +22,10 @@ func Register(r *server.Hertz) {
 		_user.POST("/get-verifycode", append(_getverifycodeMw(), user.GetVerifyCode)...)
 		_user.POST("/login", append(_loginMw(), user.Login)...)
 		_user.POST("/register", append(_registerMw(), user.Register)...)
+		{
+			_auth := _user.Group("/auth", _authMw()...)
+			_auth.POST("/change-password", append(_changepasswordMw(), user.ChangePassword)...)
+			_auth.GET("/info", append(_userinfoMw(), user.UserInfo)...)
+		}
 	}
 }

@@ -17,11 +17,12 @@ import (
 )
 
 type UserService struct {
-	db    *database.UserRepository
-	cache *cache.UserCache
-	pnRe  *regexp.Regexp
-	pwdRe *regexp.Regexp
-	ems   *ems.Client
+	db      *database.UserRepository
+	classDB *database.ClassRepository
+	cache   *cache.UserCache
+	pnRe    *regexp.Regexp
+	pwdRe   *regexp.Regexp
+	ems     *ems.Client
 }
 
 func NewUserService() *UserService {
@@ -29,11 +30,12 @@ func NewUserService() *UserService {
 	pwdRe := regexp.MustCompile("^[a-zA-Z0-9_.]+$")   // password pattern (without checks for lower/upper case)
 
 	return &UserService{
-		db:    database.NewUserRepository(),
-		cache: cache.NewUserCache(),
-		pnRe:  phoneNumberRe,
-		pwdRe: pwdRe,
-		ems:   ems.NewEmsClient(),
+		db:      database.NewUserRepository(),
+		classDB: database.NewClassRepository(),
+		cache:   cache.NewUserCache(),
+		pnRe:    phoneNumberRe,
+		pwdRe:   pwdRe,
+		ems:     ems.NewEmsClient(),
 	}
 }
 
@@ -50,9 +52,9 @@ func (svc *UserService) VerifyRequest(req interface{}) error {
 		if err := svc.verifyStudentNumber(req.GetStudentNumber()); err != nil {
 			return err
 		}
-		//if err := svc.verifyPassword(req.GetPassword()); err != nil {
-		//	return err
-		//}
+		if err := svc.verifyPassword(req.GetPassword()); err != nil {
+			return err
+		}
 		if err := svc.verifyVerifyCode(req.GetVerifyCode()); err != nil {
 			return err
 		}
@@ -66,6 +68,7 @@ func (svc *UserService) VerifyRequest(req interface{}) error {
 		if err := svc.verifyPhoneNumber(req.GetPhoneNumber()); err != nil {
 			return err
 		}
+	case *user.ChangePasswordReq:
 	default:
 		return errors.Wrap(errors.New("unknown req type"), "unknown req type")
 	}
@@ -112,6 +115,34 @@ func (svc *UserService) FindUserPassword(phoneNumber string) (pwd string, err er
 	return svc.db.FindUserPassword(phoneNumber)
 }
 
+func (svc *UserService) FindUserPasswordByID(uid int64) (pwd string, err error) {
+	return svc.db.FindUserPasswordByUID(uid)
+}
+
 func (svc *UserService) FindUIDByPhoneNumber(phoneNumber string) (int64, error) {
 	return svc.db.FindUIDByPhoneNumber(phoneNumber)
+}
+
+func (svc *UserService) ChangePassword(uid int64, newPassword string) error {
+	pwd, err := svc.EncryptPassword(newPassword)
+	if err != nil {
+		return err
+	}
+	return svc.db.ChangePassword(uid, pwd)
+}
+
+func (svc *UserService) FindUserByID(uid int64) (*user.User, error) {
+	return svc.db.FindUserByID(uid)
+}
+
+func (svc *UserService) GetWeightByUID(uid int64) (int32, error) {
+	classID, err := svc.classDB.WhetherUserInAClass(context.Background(), uid)
+	if err != nil {
+		return 0, err
+	}
+	if classID == 0 {
+		return 0, nil
+	}
+
+	return svc.classDB.FindWeightByUIDANDClassID(context.Background(), uid, classID)
 }

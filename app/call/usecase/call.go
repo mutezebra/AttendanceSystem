@@ -35,12 +35,12 @@ func (usecase *CallUsecase) CallAllStudent(ctx context.Context, req *call.CallAl
 		return nil, err
 	}
 
-	var exist bool
-	if exist, err = usecase.svc.ClassExist(ctx, req.GetClassID()); err != nil {
-		return nil, err
+	var classID int64
+	if _, classID, err = usecase.svc.WhetherUserHaveClass(ctx, req.GetUID()); err != nil {
+		return nil, errno.New(errno.UserDoNotHaveClass, "user do not have class")
 	}
-	if !exist {
-		return nil, errno.New(errno.ClassNotExist, "class not exist")
+	if req.GetClassID() == 0 {
+		req.ClassID = &classID
 	}
 
 	var is bool
@@ -84,20 +84,27 @@ func (usecase *CallUsecase) DoCallEvent(ctx context.Context, req *call.DoCallEve
 		return nil, err
 	}
 
-	var exist bool
-	if exist, err = usecase.svc.ClassExist(ctx, req.GetClassID()); err != nil {
+	if err = usecase.svc.VerifyReq(req); err != nil {
 		return nil, err
-	}
-	if !exist {
-		return nil, errno.New(errno.ClassNotExist, "class not exist")
 	}
 
-	if exist, err = usecase.svc.EventExist(ctx, req.GetEventID()); err != nil {
-		return nil, err
+	var classID int64
+	var exist bool
+	if exist, classID, err = usecase.svc.WhetherUserInAClass(ctx, req.GetUID()); err != nil {
+		return nil, errno.New(errno.UserDoNotHaveClass, "get user class error")
 	}
 	if !exist {
-		return nil, errno.New(errno.EventNotExist, "event not exist")
+		return nil, errno.New(errno.UserDoNotHaveClass, "user do not in a class")
 	}
+	if req.GetClassID() == 0 {
+		req.ClassID = &classID
+	}
+
+	var eventID int64
+	if eventID = usecase.svc.GetEventIDFromClass(req.GetClassID()); eventID == 0 {
+		return nil, errno.New(errno.EventNotExist, "do not have event")
+	}
+	req.EventID = &eventID
 
 	if err = usecase.svc.DoCallEvent(ctx, req.GetUID(), req.GetClassID(), req.GetEventID()); err != nil {
 		return nil, err
@@ -117,12 +124,16 @@ func (usecase *CallUsecase) UndoCallEvents(ctx context.Context, req *call.UndoCa
 		return nil, err
 	}
 
-	exist, err := usecase.svc.ClassExist(ctx, req.GetClassID())
-	if err != nil {
-		return nil, err
+	var classID int64
+	var exist bool
+	if exist, classID, err = usecase.svc.WhetherUserInAClass(ctx, req.GetUID()); err != nil {
+		return nil, errno.New(errno.UserDoNotHaveClass, "get user class error")
 	}
 	if !exist {
-		return nil, errno.New(errno.ClassNotExist, "class not exist")
+		return nil, errno.New(errno.UserDoNotHaveClass, "user do not in a class")
+	}
+	if req.GetClassID() == 0 {
+		req.ClassID = &classID
 	}
 
 	resp = &call.UndoCallEventsResp{
@@ -169,16 +180,17 @@ func (usecase *CallUsecase) RandomCall(ctx context.Context, req *call.RandomCall
 		return nil, err
 	}
 
+	var classID int64
 	var exist bool
-	if exist, err = usecase.svc.ClassExist(ctx, req.GetClassID()); err != nil {
-		return nil, err
+	if exist, classID, err = usecase.svc.WhetherUserHaveClass(ctx, req.GetUID()); err != nil {
+		return nil, errno.New(errno.UserDoNotHaveClass, "user do not have class")
 	}
 	if !exist {
-		return nil, errno.New(errno.ClassNotExist, "class not exist")
+		return nil, errno.New(errno.UserDoNotHaveClass, "user do not have class")
 	}
 
-	if have := usecase.svc.WhetherClassHaveEvent(req.GetClassID()); have {
-		return nil, errno.New(errno.HaveCallEvent, "now class have a call event")
+	if req.GetClassID() == 0 {
+		req.ClassID = &classID
 	}
 
 	var is bool
@@ -199,30 +211,29 @@ func (usecase *CallUsecase) RandomCall(ctx context.Context, req *call.RandomCall
 		return nil, err
 	}
 
-	var event *call.CallEvent
-	if event, err = usecase.buildCallEvent(req.CallEventName, req.ClassID, req.Deadline, req.UID, usecase.convertItems2Uids(items)); err != nil {
+	var uids []int64
+	if uids, err = usecase.svc.RandomCallUser(ctx, items, int(req.GetCallNumber()), req.GetAction(), req.GetNumber()); err != nil {
 		return nil, err
 	}
 
-	var eventID int64
-	if eventID, err = usecase.svc.CreateACallEvent(ctx, event); err != nil {
-		return nil, err
-	}
-
-	if err = usecase.svc.RandomCallUser(ctx, items, int(req.GetCallNumber()), event); err != nil {
-		return nil, err
+	result := make([]*user.BaseUser, 0, len(uids))
+	for i, u := range users {
+		for _, id := range uids {
+			if id == u.GetUID() {
+				result = append(result, users[i])
+			}
+		}
 	}
 
 	resp = new(call.RandomCallResp)
 	resp.Base = consts.DefaultBase
-	resp.EventID = &eventID
-	for _, u := range users {
+	for _, u := range result {
 		if weighet, ok := items[u.GetUID()]; ok {
 			w := int32(weighet)
 			u.Weight = &w
 		}
 	}
-	resp.Users = users
+	resp.Users = result
 
 	return resp, nil
 }
@@ -235,20 +246,16 @@ func (usecase *CallUsecase) HistoryCallEvent(ctx context.Context, req *call.Hist
 		return nil, err
 	}
 
+	var classID int64
 	var exist bool
-	if exist, err = usecase.svc.ClassExist(ctx, req.GetClassID()); err != nil {
-		return nil, err
+	if exist, classID, err = usecase.svc.WhetherUserInAClass(ctx, req.GetUID()); err != nil {
+		return nil, errno.New(errno.UserDoNotHaveClass, "get user class error")
 	}
 	if !exist {
-		return nil, errno.New(errno.ClassNotExist, "class not exist")
+		return nil, errno.New(errno.UserDoNotHaveClass, "user do not in a class")
 	}
-
-	var in bool
-	if in, err = usecase.svc.WhetherUserInClass(ctx, req.GetUID(), req.GetClassID()); err != nil {
-		return nil, err
-	}
-	if !in {
-		return nil, errno.New(errno.NotClassMember, "you are not this class member")
+	if req.GetClassID() == 0 {
+		req.ClassID = &classID
 	}
 
 	var events []*call.CallEvent
@@ -281,6 +288,9 @@ func (usecase *CallUsecase) convertUids2String(uids []int64) []string {
 func (usecase *CallUsecase) buildCallEvent(name *string, classID *int64, deadline *int16, callerID *int64, uids []int64) (*call.CallEvent, error) {
 	now := time.Now().Unix()
 	Deadline := time.Now().Add(time.Duration(*deadline) * time.Minute).Unix()
+	if *deadline == -1 {
+		Deadline = time.Now().Add(1 * time.Second).Unix()
+	}
 	return &call.CallEvent{
 		CallEventName: name,
 		ClassID:       classID,
